@@ -1,0 +1,93 @@
+OIL_VERSION = "2.5";
+
+IMPLEMENTATION trampoline {
+
+    /* This fix the default STACKSIZE of tasks */
+    TASK {
+        UINT32 STACKSIZE = 32768 ;
+    } ;
+
+    /* This fix the default STACKSIZE of ISRs */
+    ISR {
+        UINT32 STACKSIZE = 32768 ;
+    } ;
+};
+
+CPU only_one_periodic_task {
+  OS config {
+    STATUS = EXTENDED;
+    TRACE = TRUE {
+        FORMAT = json;
+        PROC = TRUE;
+        RESOURCE = TRUE;
+        ALARM = TRUE;
+        EVENT = TRUE;
+    };
+    BUILD = TRUE {
+      APP_SRC = "periodic.c";
+      TRAMPOLINE_BASE_PATH = "../../..";
+      CFLAGS="-ggdb";
+      APP_NAME = "periodic_exe";
+      LINKER = "gcc";
+      SYSTEM = PYTHON;
+    };
+  };
+
+  ALARM alarmForContact {
+    COUNTER = SystemCounter;
+    ACTION = ACTIVATETASK { TASK = Detection_contact; };
+    AUTOSTART = TRUE { APPMODE = stdAppmode; ALARMTIME = 100; CYCLETIME = 100; };
+  };
+
+  ALARM alarmForDistance {
+    COUNTER = SystemCounter;
+    ACTION = ACTIVATETASK { TASK = Detection_distance; };
+    AUTOSTART = TRUE { APPMODE = stdAppmode; ALARMTIME = 300; CYCLETIME = 300; };
+  };
+
+  ALARM alarmForNaviation {
+    COUNTER = SystemCounter;
+    ACTION = ACTIVATETASK { TASK = Navigation; };
+    AUTOSTART = TRUE { APPMODE = stdAppmode; ALARMTIME = 200; CYCLETIME = 200;};
+  };
+  
+  
+  ALARM stopper {
+    COUNTER = SystemCounter;
+    ACTION = ACTIVATETASK { TASK = stop; };
+    AUTOSTART = TRUE { APPMODE = stdAppmode; ALARMTIME = 5000; CYCLETIME = 0; };
+  };
+  APPMODE stdAppmode {};
+  
+
+  TASK Detection_contact {
+    PRIORITY = 1;
+    AUTOSTART = TRUE { APPMODE = stdAppmode;};
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  };
+
+  TASK Detection_distance {
+    PRIORITY = 1;
+    AUTOSTART = TRUE { APPMODE = stdAppmode;};
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  };
+
+  TASK Navigation {
+    PRIORITY = 1;
+    AUTOSTART = TRUE { APPMODE = stdAppmode;};
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  };
+  
+  TASK stop {
+    PRIORITY = 2;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+  };
+};

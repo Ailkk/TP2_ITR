@@ -14,26 +14,27 @@ int main(void)
     return 0;
 }
 
+int val_distance = 100;
 static int port = 8;
 
 DeclareAlarm(alarmForContact);
 DeclareAlarm(alarmForDistance);
-DeclareResource(distance);
+DeclareResource(resource_distance);
 
 TASK(Detection_contact)
 {
   StatusType err;
-  err = GetResource(distance);
+  err = GetResource(resource_distance);
   if(err == E_OK){
     int touch = ecrobot_get_touch_sensor(NXT_PORT_S2);
     //touch 0 = False | touch 255 = True
-    if(touch == 1 && distance != 0){
-      //distance = 0;
-      printf("[CONTACT CAPTOR] Le touch est a : %d. La distance change et passe a %d \r\n", touch ,distance);
+    if(touch == 1 && val_distance != 0){
+      val_distance = 0;
+      printf("[CONTACT CAPTOR] Le touch est a : %d. La distance change et passe a %d \r\n", touch ,val_distance);
     }else{
-      printf("[CONTACT CAPTOR] Le touch est a : %d. La distance reste de : %d \r\n", touch ,distance);
+      printf("[CONTACT CAPTOR] Le touch est a : %d. La distance reste de : %d \r\n", touch ,val_distance);
     }
-    err = ReleaseResource(distance);
+    err = ReleaseResource(resource_distance);
   }
   TerminateTask();
 }
@@ -51,12 +52,11 @@ TASK(Detection_distance)
    * si la distance n'est pas égale à 0.
    */
   StatusType err;
-  err = GetResource(distance);
-  printf("Bonjour %d\n\r", err);
+  err = GetResource(resource_distance);
   if(err == E_OK){
-    //distance = ecrobot_get_sonar_sensor(NXT_PORT_S1);
-    printf("[DISTANCE CAPTOR] La distance est maintenant de  : %d \r\n",distance);
-    err = ReleaseResource(distance);
+    val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S1);
+    printf("[DISTANCE CAPTOR] La distance est maintenant de  : %d \r\n",val_distance);
+    err = ReleaseResource(resource_distance);
   }
   TerminateTask();
 }
@@ -65,7 +65,7 @@ TASK(Navigation){
   static int periode = 0;
 
   StatusType err;
-  err = GetResource(distance);
+  err = GetResource(resource_distance);
 
   if(err == E_OK)
   {
@@ -73,17 +73,17 @@ TASK(Navigation){
       printf("période : %d\r\n",periode);
     }
     else {
-      if(distance == 0){
+      if(val_distance == 0){
         printf("[NAVIGATION] Marche arrière\r\n");
-        //distance += 10;
+        val_distance += 10;
       }
-      if(distance < 50){
-        //distance = ecrobot_get_sonar_sensor(NXT_PORT_S1);
-        printf("[NAVIGATION] On tourne, nouvelle distance : %d\r\n", distance);
+      if(val_distance < 50){
+        val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S1);
+        printf("[NAVIGATION] On tourne, nouvelle distance : %d\r\n", val_distance);
         
       }
     }
-    err = ReleaseResource(distance);
+    err = ReleaseResource(resource_distance);
   }
   periode++;
   TerminateTask();

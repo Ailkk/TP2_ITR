@@ -59,7 +59,7 @@ CPU only_one_periodic_task {
   };
   APPMODE stdAppmode {};
   
-  RESOURCE distance {
+  RESOURCE resource_distance {
     RESOURCEPROPERTY = STANDARD;
   };
 
@@ -69,7 +69,7 @@ CPU only_one_periodic_task {
     ACTIVATION = 1;
     SCHEDULE = FULL;
     STACKSIZE = 512;
-    RESOURCE = distance;
+    RESOURCE = resource_distance;
   };
 
   TASK Detection_distance {
@@ -78,7 +78,7 @@ CPU only_one_periodic_task {
     ACTIVATION = 1;
     SCHEDULE = FULL;
     STACKSIZE = 512;
-    RESOURCE = distance;
+    RESOURCE = resource_distance;
   };
 
   TASK Navigation {
@@ -87,7 +87,7 @@ CPU only_one_periodic_task {
     ACTIVATION = 1;
     SCHEDULE = FULL;
     STACKSIZE = 512;
-    RESOURCE = distance;
+    RESOURCE = resource_distance;
   };
   
   TASK stop {

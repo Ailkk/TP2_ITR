@@ -59,6 +59,9 @@ CPU only_one_periodic_task {
   };
   APPMODE stdAppmode {};
   
+  RESOURCE distance {
+    RESOURCEPROPERTY = STANDARD;
+  };
 
   TASK Detection_contact {
     PRIORITY = 1;
@@ -66,26 +69,29 @@ CPU only_one_periodic_task {
     ACTIVATION = 1;
     SCHEDULE = FULL;
     STACKSIZE = 512;
+    RESOURCE = distance;
   };
 
   TASK Detection_distance {
-    PRIORITY = 1;
+    PRIORITY = 2;
     AUTOSTART = TRUE { APPMODE = stdAppmode;};
     ACTIVATION = 1;
     SCHEDULE = FULL;
     STACKSIZE = 512;
+    RESOURCE = distance;
   };
 
   TASK Navigation {
-    PRIORITY = 1;
+    PRIORITY = 3;
     AUTOSTART = TRUE { APPMODE = stdAppmode;};
     ACTIVATION = 1;
     SCHEDULE = FULL;
     STACKSIZE = 512;
+    RESOURCE = distance;
   };
   
   TASK stop {
-    PRIORITY = 2;
+    PRIORITY = 5;
     AUTOSTART = FALSE;
     ACTIVATION = 1;
     SCHEDULE = FULL;

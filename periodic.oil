@@ -64,7 +64,7 @@ CPU only_one_periodic_task {
   };
 
   TASK Detection_contact {
-    PRIORITY = 1;
+    PRIORITY = 3;
     AUTOSTART = TRUE { APPMODE = stdAppmode;};
     ACTIVATION = 1;
     SCHEDULE = FULL;
@@ -82,7 +82,7 @@ CPU only_one_periodic_task {
   };
 
   TASK Navigation {
-    PRIORITY = 3;
+    PRIORITY = 1;
     AUTOSTART = TRUE { APPMODE = stdAppmode;};
     ACTIVATION = 1;
     SCHEDULE = FULL;
@@ -91,7 +91,7 @@ CPU only_one_periodic_task {
   };
   
   TASK stop {
-    PRIORITY = 5;
+    PRIORITY = 1;
     AUTOSTART = FALSE;
     ACTIVATION = 1;
     SCHEDULE = FULL;

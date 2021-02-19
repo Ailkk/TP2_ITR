@@ -32,7 +32,7 @@ CPU only_one_periodic_task {
       SYSTEM = PYTHON;
     };
   };
-
+/*
   ALARM alarmForContact {
     COUNTER = SystemCounter;
     ACTION = ACTIVATETASK { TASK = Detection_contact; };
@@ -50,7 +50,13 @@ CPU only_one_periodic_task {
     ACTION = ACTIVATETASK { TASK = Navigation; };
     AUTOSTART = TRUE { APPMODE = stdAppmode; ALARMTIME = 200; CYCLETIME = 200;};
   };
-  
+  */
+
+    ALARM alarmtask0 {
+    COUNTER = SystemCounter;
+    ACTION = ACTIVATETASK { TASK = task0; };
+    AUTOSTART = TRUE { APPMODE = stdAppmode; ALARMTIME = 1000; CYCLETIME = 1000;};
+  };
   
   ALARM stopper {
     COUNTER = SystemCounter;
@@ -58,7 +64,7 @@ CPU only_one_periodic_task {
     AUTOSTART = TRUE { APPMODE = stdAppmode; ALARMTIME = 5000; CYCLETIME = 0; };
   };
   APPMODE stdAppmode {};
-  
+  /*
   RESOURCE resource_distance {
     RESOURCEPROPERTY = STANDARD;
   };
@@ -89,7 +95,16 @@ CPU only_one_periodic_task {
     STACKSIZE = 512;
     RESOURCE = resource_distance;
   };
-  
+  */
+TASK task0 {
+    PRIORITY = 1;
+    AUTOSTART = TRUE { APPMODE = stdAppmode;};
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  };
+
+
   TASK stop {
     PRIORITY = 1;
     AUTOSTART = FALSE;

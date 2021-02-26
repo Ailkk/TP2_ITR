@@ -46,7 +46,7 @@ CPU test {
         };
     } ;
 
-
+ 
 
     ALARM alarmForContact {
     COUNTER = SystemCounter;
@@ -60,7 +60,7 @@ CPU test {
     AUTOSTART = TRUE { APPMODE = std; ALARMTIME = 300; CYCLETIME = 300; };
   };
 
-  ALARM alarmForNaviation {
+  ALARM alarmForNavigation {
     COUNTER = SystemCounter;
     ACTION = ACTIVATETASK { TASK = Navigation; };
     AUTOSTART = TRUE { APPMODE = std; ALARMTIME = 200; CYCLETIME = 200;};

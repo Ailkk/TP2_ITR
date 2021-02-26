@@ -21,11 +21,12 @@
 #include "ecrobot_private.h"
 
 int val_distance;
+int touche;
+
 
 FUNC(int, OS_APPL_CODE) main(void)
-{   
-val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S1);
-  
+{
+    val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S4);
     StartOS(OSDEFAULTAPPMODE);
     ShutdownOS(E_OK);
     return 0;
@@ -33,28 +34,33 @@ val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S1);
 
 
 
-DeclareAlarm(alarmForContact);
-DeclareAlarm(alarmForDistance);
+//DeclareAlarm(alarmForContact);
+//DeclareAlarm(alarmForDistance);
 DeclareResource(resource_distance);
 
 TASK(Detection_contact)
 {
   StatusType err;
-  err = GetResource(resource_distance);
-  if(err == E_OK){
+   err = GetResource(resource_distance);
+  if(err == E_OK)
+   val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S4);
+
+  err = ReleaseResource(resource_distance);
+
     int touchR = ecrobot_get_touch_sensor(NXT_PORT_S3);
     int touchL = ecrobot_get_touch_sensor(NXT_PORT_S2);
 
     if(touchL == 1 || touchR ==1){
       //Stop
       val_distance = 0;
-      ecrobot_set_motor_speed(NXT_PORT_A,0);
-      ecrobot_set_motor_speed(NXT_PORT_B,0);
+      if(touchL == 1){
+        touche = 0;
+      }else{
+        touche = 1;
+      }
       //printf("[CONTACT CAPTOR] Le touch est a : %d. La distance change et passe a %d \r\n", touch ,val_distance);
       //display_string("contact");
     }
-    err = ReleaseResource(resource_distance);
-  }
   TerminateTask();
 }
 
@@ -62,75 +68,111 @@ TASK(Detection_contact)
 TASK(Detection_distance)
 {
   StatusType err;
-  err = GetResource(resource_distance);
-  if(err == E_OK){
-    val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S4);
+   err = GetResource(resource_distance);
+  if(err == E_OK)
+  {
+    err = ReleaseResource(resource_distance);
+        val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S4);
+  }
+  
     //printf("[DISTANCE CAPTOR] La distance est maintenant de  : %d \r\n",val_distance);
     //display_int(distance);
-    err = ReleaseResource(resource_distance);
-  }
   TerminateTask();
 }
 
 TASK(Navigation){
   static int periode = 0;
 
-  StatusType err;
-  err = GetResource(resource_distance);
+  static int compt = 0;
 
-  if(err == E_OK)
-  {
-    if(periode%10 == 0){
-      //Stop
+  if(compt != 0){
+    compt +=1;
+    if(compt == 5){
+      compt = 0;
+      if(touche==0){
       ecrobot_set_motor_speed(NXT_PORT_A,50);
       ecrobot_set_motor_speed(NXT_PORT_B,-50);
-      //tourne
+      }else{
+      ecrobot_set_motor_speed(NXT_PORT_A,-50);
+      ecrobot_set_motor_speed(NXT_PORT_B,50);
+      }
+    }
+  }else{
+    
+  int dist=0;
+  StatusType err;
+   err = GetResource(resource_distance);
+  if(err == E_OK){
+    //val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S4);
+    dist = val_distance;
+  }
+  err = ReleaseResource(resource_distance);   
+    if(periode%10 == 0){
+      //Stop
+    //tourne
       //int randAng = rand()%360;
       //int randDirect = rand()%2;
       //if(randDirect == 0){
 //nxt_motor_set_count(NXT_PORT_A,90);
-        //printf("[NAVIGATION] période : %d | a tourner a Gauche a %d\r\n",periode,randAng);
-        //display_string("gauche");
+    //printf("[NAVIGATION] période : %d | a tourner a Gauche a %d\r\n",periode,randAng);
+    //display_string("gauche");
       //}else{
-        //nxt_motor_set_count(NXT_PORT_B,-(randAng));
-        //printf("[NAVIGATION] période : %d | a tourner a Droite a %d\r\n",periode,randAng);
-        //display_string("droit");
+  //nxt_motor_set_count(NXT_PORT_B,-(randAng));
+    //printf("[NAVIGATION] période : %d | a tourner a Droite a %d\r\n",periode,randAng);
+    //display_string("droit");
       //} 
       //Avance
+      if(dist%2==0){
+
+      ecrobot_set_motor_speed(NXT_PORT_A,50);
+      ecrobot_set_motor_speed(NXT_PORT_B,-50);
+      }else{
       ecrobot_set_motor_speed(NXT_PORT_A,-50);
       ecrobot_set_motor_speed(NXT_PORT_B,50);
+      }
+      
       
     }
-    else {
-      if(val_distance == 0){
+    else if(dist == 0){
         //display_string("back");
         //printf("[NAVIGATION] Marche arrière\r\n");
         //val_distance += 10;
         //Marche arriere pour les deux moteur
         ecrobot_set_motor_speed(NXT_PORT_A,-50);
         ecrobot_set_motor_speed(NXT_PORT_B,-50);
+        compt = 1;
       }
-      if(val_distance < 50){
-        val_distance = ecrobot_get_sonar_sensor(NXT_PORT_S4);
+      else if(dist < 50){
+        compt = 1;
         //printf("[NAVIGATION] On tourne, nouvelle distance : %d\r\n", val_distance);
-        //Stop
-        ecrobot_set_motor_speed(NXT_PORT_A,50);
-        ecrobot_set_motor_speed(NXT_PORT_B,-50);
+        
         //Tourne de 90° droit ou gauche
         //int randDirect = rand()%2;
         //if(randDirect == 0){
-          nxt_motor_set_count(NXT_PORT_A,90);
+    //nxt_motor_set_count(NXT_PORT_A,90);
         //}else{
          // nxt_motor_set_count(NXT_PORT_B,-(90));
         //}
         //Avance
-        ecrobot_set_motor_speed(NXT_PORT_A,-50);
-        ecrobot_set_motor_speed(NXT_PORT_B,50);
+        
+      if(touche==0){
+      ecrobot_set_motor_speed(NXT_PORT_A,50);
+      ecrobot_set_motor_speed(NXT_PORT_B,-50);
+      }else{
+      ecrobot_set_motor_speed(NXT_PORT_A,-50);
+      ecrobot_set_motor_speed(NXT_PORT_B,50);
       }
-    }
-    err = ReleaseResource(resource_distance);
+      }else{
+
+      //avance si tout va bien
+        ecrobot_set_motor_speed(NXT_PORT_A,50);
+        ecrobot_set_motor_speed(NXT_PORT_B,50);
+    
+      }
+    
   }
   periode++;
+
   TerminateTask();
 }
 
